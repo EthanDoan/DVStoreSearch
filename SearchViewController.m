@@ -134,24 +134,30 @@ static NSString * const LoadingCellIdentifier = @"LoadingCell";
             NSString *jsonString = [self performStoreRequestWithURL:url];
             
             if (jsonString == nil) {
-                NSLog(@"Error!");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self showNetworkError];
+                });
                 return;
             }
             
             NSDictionary *dictionary = [self parseJSON:jsonString];
             if (dictionary == nil) {
-                NSLog(@"Error!");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self showNetworkError];
+                });
                 return;
             }
             
             [self parseDictionary:dictionary];
             
             [_searchResults sortUsingSelector:@selector(compareName:)];
-            NSLog(@"DONE!");
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _isLoading = NO;
+                [self.tableView reloadData];
+            });
         });
         
-        _isLoading = NO;
-        [self.tableView reloadData];
     }
     
     
